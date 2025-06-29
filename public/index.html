@@ -34,10 +34,6 @@
             <div class="controls-content">
                 <div class="left-controls">
                     <div class="folder-selector">
-                        <button id="selectFolderBtn" class="btn btn-secondary">
-                            <i class="fas fa-folder-open"></i>
-                            Select Folder
-                        </button>
                         <input type="text" id="folderPath" class="folder-input" placeholder="Enter folder path...">
                         <button id="loadFolderBtn" class="btn btn-primary">
                             <i class="fas fa-arrow-right"></i>
@@ -103,54 +99,7 @@
         </main>
     </div>
 
-    <!-- Folder Browser Modal -->
-    <div id="folderModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>
-                    <i class="fas fa-folder-open"></i>
-                    Select Image Folder
-                </h3>
-                <button class="close-btn" title="Close" onclick="imageManipulator.closeFolderModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="folder-input-group">
-                    <label for="modalFolderPath">Folder Path:</label>
-                    <input type="text" id="modalFolderPath" class="modal-folder-input" placeholder="C:\Path\To\Your\Images">
-                </div>
-                <div class="common-folders">
-                    <h4>Common Locations:</h4>
-                    <div class="folder-shortcuts">
-                        <button class="folder-shortcut" onclick="imageManipulator.selectCommonFolder('Pictures')">
-                            <i class="fas fa-images"></i>
-                            Pictures
-                        </button>
-                        <button class="folder-shortcut" onclick="imageManipulator.selectCommonFolder('Downloads')">
-                            <i class="fas fa-download"></i>
-                            Downloads
-                        </button>
-                        <button class="folder-shortcut" onclick="imageManipulator.selectCommonFolder('Desktop')">
-                            <i class="fas fa-desktop"></i>
-                            Desktop
-                        </button>
-                        <button class="folder-shortcut" onclick="imageManipulator.selectCommonFolder('Documents')">
-                            <i class="fas fa-file-alt"></i>
-                            Documents
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="imageManipulator.closeFolderModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="imageManipulator.confirmFolderSelection()">
-                    <i class="fas fa-check"></i>
-                    Load Images
-                </button>
-            </div>
-        </div>
-    </div>
+
 
     <script src="script.js"></script>
 </body>

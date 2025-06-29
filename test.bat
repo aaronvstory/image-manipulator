@@ -37,7 +37,7 @@ if exist "node_modules" (
 
 echo.
 echo 4. Checking sample directory...
-set "TARGET_DIR=.\sample-images"
+set "TARGET_DIR=.\test-images"
 if exist "%TARGET_DIR%" (
     echo    - Sample directory exists
     echo    - Ready for testing with sample images

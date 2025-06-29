@@ -12,7 +12,7 @@ app.use(express.json());
 
 // Configuration - Default target directory for images
 // Users can change this through the web interface or set via environment variable
-let IMAGE_DIR = process.env.IMAGE_DIR || './sample-images';
+let IMAGE_DIR = process.env.IMAGE_DIR || null;
 
 // Supported image extensions
 const SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.tiff', '.bmp'];

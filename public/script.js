@@ -19,11 +19,7 @@ class ImageManipulator {
             this.loadImages();
         });
 
-        // Folder selection buttons
-        document.getElementById('selectFolderBtn').addEventListener('click', () => {
-            this.openFolderModal();
-        });
-
+        // Load folder button
         document.getElementById('loadFolderBtn').addEventListener('click', () => {
             const folderPath = document.getElementById('folderPath').value.trim();
             if (folderPath) {
@@ -38,20 +34,6 @@ class ImageManipulator {
                 if (folderPath) {
                     this.setDirectory(folderPath);
                 }
-            }
-        });
-
-        // Modal close on background click
-        document.getElementById('folderModal').addEventListener('click', (e) => {
-            if (e.target.id === 'folderModal') {
-                this.closeFolderModal();
-            }
-        });
-
-        // Modal enter key
-        document.getElementById('modalFolderPath').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.confirmFolderSelection();
             }
         });
     }
@@ -134,45 +116,7 @@ class ImageManipulator {
         }
     }
 
-    openFolderModal() {
-        const modal = document.getElementById('folderModal');
-        const input = document.getElementById('modalFolderPath');
-        
-        // Pre-fill with current directory
-        input.value = this.currentDirectory;
-        modal.classList.remove('hidden');
-        
-        // Focus on input
-        setTimeout(() => input.focus(), 100);
-    }
 
-    closeFolderModal() {
-        document.getElementById('folderModal').classList.add('hidden');
-    }
-
-    confirmFolderSelection() {
-        const folderPath = document.getElementById('modalFolderPath').value.trim();
-        if (folderPath) {
-            this.closeFolderModal();
-            this.setDirectory(folderPath);
-        }
-    }
-
-
-
-    selectCommonFolder(folderType) {
-        const commonPaths = {
-            'Pictures': 'C:\\Users\\%USERNAME%\\Pictures',
-            'Downloads': 'C:\\Users\\%USERNAME%\\Downloads',
-            'Desktop': 'C:\\Users\\%USERNAME%\\Desktop',
-            'Documents': 'C:\\Users\\%USERNAME%\\Documents'
-        };
-
-        const folderPath = commonPaths[folderType];
-        if (folderPath) {
-            document.getElementById('modalFolderPath').value = folderPath;
-        }
-    }
 
     async loadImages() {
         try {

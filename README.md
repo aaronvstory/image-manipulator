@@ -130,7 +130,7 @@ image-manipulator/
 │   ├── 🌐 index.html         # Main interface
 │   ├── 🎨 style.css          # Modern UI styling
 │   └── ⚡ script.js          # Client-side logic
-├── 📁 sample-images/         # Sample directory (empty)
+
 ├── 📦 package.json           # Dependencies
 ├── 📖 README.md              # This file
 ├── 📋 CHANGELOG.md           # Version history
