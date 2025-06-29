@@ -384,12 +384,13 @@ class ImageRotator {
         if (lastRotation && (now - lastRotation) < this.rotationCooldown) {
             const remainingTime = Math.ceil((this.rotationCooldown - (now - lastRotation)) / 1000);
             this.showThrottleMessage(card, remainingTime);
-            return;
+            return; // IMPORTANT: This prevents the API call completely
         }
 
         // Prevent multiple simultaneous rotations on the same image
         if (card.classList.contains('processing')) {
-            return;
+            this.showThrottleMessage(card, 2);
+            return; // IMPORTANT: This also prevents the API call
         }
 
         try {
@@ -565,15 +566,46 @@ class ImageRotator {
                 </div>
             `;
             
-            // Position the preview relative to the card
+            // Position the preview optimally on screen
             const rect = card.getBoundingClientRect();
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            // Preview dimensions (approximate)
+            const previewWidth = 650;
+            const previewHeight = 500;
+            
+            let left, top;
+            
+            // Try to position to the right first
+            if (rect.right + previewWidth + 20 < windowWidth) {
+                left = rect.right + scrollLeft + 15;
+            } 
+            // If not enough space on right, try left
+            else if (rect.left - previewWidth - 20 > 0) {
+                left = rect.left + scrollLeft - previewWidth - 15;
+            }
+            // If neither side works, center horizontally
+            else {
+                left = Math.max(10, (windowWidth - previewWidth) / 2 + scrollLeft);
+            }
+            
+            // Vertical positioning - try to center on the card
+            top = rect.top + scrollTop - (previewHeight - rect.height) / 2;
+            
+            // Keep preview within viewport
+            if (top < scrollTop + 10) {
+                top = scrollTop + 10;
+            } else if (top + previewHeight > scrollTop + windowHeight - 10) {
+                top = scrollTop + windowHeight - previewHeight - 10;
+            }
             
             previewElement.style.position = 'absolute';
-            previewElement.style.left = (rect.right + scrollLeft + 10) + 'px';
-            previewElement.style.top = (rect.top + scrollTop) + 'px';
-            previewElement.style.zIndex = '9999';
+            previewElement.style.left = left + 'px';
+            previewElement.style.top = top + 'px';
+            previewElement.style.zIndex = '10000';
             
             document.body.appendChild(previewElement);
             

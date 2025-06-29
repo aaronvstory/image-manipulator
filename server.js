@@ -77,11 +77,11 @@ async function generateThumbnail(imagePath) {
 async function generatePreview(imagePath) {
     try {
         const preview = await sharp(imagePath)
-            .resize(800, 800, { 
+            .resize(1200, 900, { 
                 fit: 'inside', 
-                withoutEnlargement: true 
+                withoutEnlargement: false 
             })
-            .jpeg({ quality: 90 })
+            .jpeg({ quality: 95 })
             .toBuffer();
         
         return preview;
