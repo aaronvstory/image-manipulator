@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Rotator - Bulk Photo Management</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>
+                    <i class="fas fa-sync-alt"></i>
+                    Image Rotator
+                </h1>
+                <div class="stats">
+                    <span id="imageCount" class="stat-badge">
+                        <i class="fas fa-images"></i>
+                        <span id="totalImages">0</span> images
+                    </span>
+                    <span id="loadingIndicator" class="loading-badge">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Loading...
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Controls -->
+        <div class="controls-section">
+            <div class="controls-content">
+                <div class="left-controls">
+                    <div class="folder-selector">
+                        <button id="selectFolderBtn" class="btn btn-secondary">
+                            <i class="fas fa-folder-open"></i>
+                            Select Folder
+                        </button>
+                        <input type="text" id="folderPath" class="folder-input" placeholder="Enter folder path...">
+                        <button id="loadFolderBtn" class="btn btn-primary">
+                            <i class="fas fa-arrow-right"></i>
+                            Load
+                        </button>
+                        <button id="refreshBtn" class="btn btn-accent">
+                            <i class="fas fa-refresh"></i>
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="current-folder">
+                        <i class="fas fa-folder"></i>
+                        <span id="currentFolder">No folder selected</span>
+                    </div>
+                </div>
+                
+                <div class="right-controls">
+                    <div class="grid-controls">
+                        <label for="gridSize" class="grid-label">
+                            <i class="fas fa-th"></i>
+                            Grid Size:
+                        </label>
+                        <input type="range" id="gridSize" class="grid-slider" min="100" max="400" value="180" step="20">
+                        <span id="gridSizeValue" class="grid-value">180px</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <div class="help-text">
+                    <i class="fas fa-info-circle"></i>
+                    Click thumbnails for 90° CW rotation, or use precision buttons
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div id="errorMessage" class="error-message hidden">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span></span>
+            </div>
+
+            <!-- Image Grid -->
+            <div id="imageGrid" class="image-grid">
+                <!-- Images will be dynamically loaded here -->
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingGrid" class="loading-grid">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading images...</p>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state hidden">
+                <i class="fas fa-folder-open"></i>
+                <h3>No Images Found</h3>
+                <p>No images were found in the specified directory. Try selecting a different folder.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Folder Browser Modal -->
+    <div id="folderModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-folder-open"></i>
+                    Select Image Folder
+                </h3>
+                <button class="close-btn" title="Close" onclick="imageRotator.closeFolderModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="folder-input-group">
+                    <label for="modalFolderPath">Folder Path:</label>
+                    <input type="text" id="modalFolderPath" class="modal-folder-input" placeholder="C:\Path\To\Your\Images">
+                    <button class="btn btn-secondary" onclick="imageRotator.browseForFolder()">
+                        <i class="fas fa-folder"></i>
+                        Browse
+                    </button>
+                </div>
+                <div class="common-folders">
+                    <h4>Common Locations:</h4>
+                    <div class="folder-shortcuts">
+                        <button class="folder-shortcut" onclick="imageRotator.selectCommonFolder('Pictures')">
+                            <i class="fas fa-images"></i>
+                            Pictures
+                        </button>
+                        <button class="folder-shortcut" onclick="imageRotator.selectCommonFolder('Downloads')">
+                            <i class="fas fa-download"></i>
+                            Downloads
+                        </button>
+                        <button class="folder-shortcut" onclick="imageRotator.selectCommonFolder('Desktop')">
+                            <i class="fas fa-desktop"></i>
+                            Desktop
+                        </button>
+                        <button class="folder-shortcut" onclick="imageRotator.selectCommonFolder('Documents')">
+                            <i class="fas fa-file-alt"></i>
+                            Documents
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="imageRotator.closeFolderModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="imageRotator.confirmFolderSelection()">
+                    <i class="fas fa-check"></i>
+                    Load Images
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
