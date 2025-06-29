@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
 
-:: Image Manipulator - Automated Launch Script
+:: Image Manipulator v2.0 - Automated Launch Script
 :: PAPESLAY - Comprehensive server management with auto-launch and cleanup
 
 echo.

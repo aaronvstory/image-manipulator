@@ -1,5 +1,5 @@
 @echo off
-:: Emergency cleanup script for Image Manipulator
+:: Emergency cleanup script for Image Manipulator v2.0
 :: PAPESLAY - Force cleanup if main script fails
 
 echo.
