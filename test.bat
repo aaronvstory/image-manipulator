@@ -1,9 +1,9 @@
 @echo off
-:: Test script for Image Rotator functionality
+:: Test script for Image Manipulator functionality
 :: PAPESLAY - Automated testing
 
 echo.
-echo Testing Image Rotator Components...
+echo Testing Image Manipulator Components...
 echo.
 
 cd /d "%~dp0"

@@ -1,9 +1,9 @@
 @echo off
-:: Emergency cleanup script for Image Rotator
+:: Emergency cleanup script for Image Manipulator
 :: PAPESLAY - Force cleanup if main script fails
 
 echo.
-echo 🧹 Image Rotator - Emergency Cleanup
+echo 🧹 Image Manipulator - Emergency Cleanup
 echo.
 
 echo 🛑 Stopping all Node.js processes...

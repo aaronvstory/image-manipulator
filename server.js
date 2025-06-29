@@ -91,45 +91,121 @@ async function generatePreview(imagePath) {
     }
 }
 
-// Rotate image and save back to original file
+// Rotate image with robust retry logic for Windows file locking
 async function rotateImage(imagePath, degrees) {
-    try {
-        // Check if file is accessible before starting
-        await fs.access(imagePath, fs.constants.R_OK | fs.constants.W_OK);
-        
-        // Read the original image
-        const imageBuffer = await fs.readFile(imagePath);
-        
-        // Rotate the image
-        const rotatedBuffer = await sharp(imageBuffer)
-            .rotate(degrees)
-            .toBuffer();
-        
-        // Write back to the original file with proper error handling
-        await fs.writeFile(imagePath, rotatedBuffer);
-        
-        // Ensure file is fully written by checking its stats
-        await fs.stat(imagePath);
-        
-        // Small delay to ensure file system has fully committed the write
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        console.log(`Successfully rotated ${imagePath} by ${degrees} degrees`);
-        return true;
-    } catch (error) {
-        console.error(`Error rotating image ${imagePath}:`, error);
-        
-        // Provide more specific error messages
-        if (error.code === 'ENOENT') {
-            throw new Error('Image file not found');
-        } else if (error.code === 'EACCES') {
-            throw new Error('Permission denied - file may be locked by another process');
-        } else if (error.code === 'EBUSY') {
-            throw new Error('File is busy - please try again in a moment');
-        } else {
-            throw new Error(`Image processing failed: ${error.message}`);
+    const maxRetries = 3;
+    let lastError = null;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            console.log(`Attempting to rotate ${imagePath} (attempt ${attempt}/${maxRetries})`);
+            
+            // Check if file is accessible
+            await fs.access(imagePath, fs.constants.R_OK | fs.constants.W_OK);
+            
+            // Read the original image with retry logic
+            let imageBuffer;
+            try {
+                imageBuffer = await fs.readFile(imagePath);
+            } catch (readError) {
+                if (attempt < maxRetries && (readError.code === 'EBUSY' || readError.code === 'UNKNOWN')) {
+                    console.log(`File read failed (attempt ${attempt}), retrying...`);
+                    await new Promise(resolve => setTimeout(resolve, 200 * attempt)); // Exponential backoff
+                    continue;
+                }
+                throw readError;
+            }
+            
+            // Rotate the image
+            const rotatedBuffer = await sharp(imageBuffer)
+                .rotate(degrees)
+                .toBuffer();
+            
+            // Write back to the original file with retry logic
+            try {
+                // Try to write to a temporary file first, then rename
+                const tempPath = imagePath + '.tmp';
+                await fs.writeFile(tempPath, rotatedBuffer);
+                
+                // Ensure the temp file is fully written
+                const fd = await fs.open(tempPath, 'r+');
+                try {
+                    await fd.sync();
+                } finally {
+                    await fd.close();
+                }
+                
+                // Rename temp file to original (atomic operation on most systems)
+                await fs.rename(tempPath, imagePath);
+                
+            } catch (writeError) {
+                if (attempt < maxRetries && (writeError.code === 'EBUSY' || writeError.code === 'UNKNOWN' || writeError.code === 'EACCES')) {
+                    console.log(`File write failed (attempt ${attempt}), retrying...`);
+                    // Clean up temp file if it exists
+                    try {
+                        await fs.unlink(imagePath + '.tmp');
+                    } catch (cleanupError) {
+                        // Ignore cleanup errors
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 300 * attempt)); // Longer delay for write operations
+                    continue;
+                }
+                throw writeError;
+            }
+            
+            // Verify the file was written correctly
+            const finalStats = await fs.stat(imagePath);
+            if (finalStats.size === 0) {
+                throw new Error('File was corrupted during write operation');
+            }
+            
+            // Additional delay to ensure file system stability
+            await new Promise(resolve => setTimeout(resolve, 150));
+            
+            console.log(`Successfully rotated ${imagePath} by ${degrees} degrees`);
+            return true;
+            
+        } catch (error) {
+            lastError = error;
+            console.error(`Rotation attempt ${attempt} failed for ${imagePath}:`, error.message);
+            
+            // If this isn't the last attempt and it's a retryable error, continue
+            if (attempt < maxRetries && isRetryableError(error)) {
+                const delay = 400 * attempt; // Exponential backoff
+                console.log(`Waiting ${delay}ms before retry...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                continue;
+            }
+            
+            // If we've exhausted retries or it's a non-retryable error, throw
+            break;
         }
     }
+    
+    // If we get here, all retries failed
+    console.error(`All ${maxRetries} rotation attempts failed for ${imagePath}`);
+    
+    // Provide more specific error messages
+    if (lastError.code === 'ENOENT') {
+        throw new Error('Image file not found');
+    } else if (lastError.code === 'EACCES') {
+        throw new Error('Permission denied - file may be locked by another process');
+    } else if (lastError.code === 'EBUSY') {
+        throw new Error('File is busy - please try again in a moment');
+    } else if (lastError.code === 'UNKNOWN') {
+        throw new Error('File access error - file may be locked or corrupted');
+    } else {
+        throw new Error(`Image processing failed after ${maxRetries} attempts: ${lastError.message}`);
+    }
+}
+
+// Helper function to determine if an error is retryable
+function isRetryableError(error) {
+    const retryableCodes = ['EBUSY', 'UNKNOWN', 'EACCES', 'EAGAIN', 'EMFILE', 'ENFILE'];
+    return retryableCodes.includes(error.code) || 
+           error.message.includes('locked') || 
+           error.message.includes('busy') ||
+           error.message.includes('access');
 }
 
 // API Routes
@@ -305,7 +381,7 @@ app.post('/api/rotate', async (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-    console.log(`\n🎨 Image Rotator Server running at http://localhost:${PORT}`);
+    console.log(`\n🎨 Image Manipulator Server running at http://localhost:${PORT}`);
     console.log(`📁 Current directory: ${IMAGE_DIR}`);
     console.log('🚀 Ready for image rotation!\n');
 });

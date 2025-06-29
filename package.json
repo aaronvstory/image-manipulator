@@ -1,5 +1,5 @@
 {
-  "name": "image-rotator",
+  "name": "image-manipulator",
   "version": "1.0.0",
   "description": "Beautiful web app for bulk image rotation with thumbnail grid view",
   "main": "server.js",

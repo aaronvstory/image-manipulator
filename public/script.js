@@ -1,4 +1,4 @@
-class ImageRotator {
+class ImageManipulator {
     constructor() {
         this.images = [];
         this.currentDirectory = '';
@@ -158,51 +158,7 @@ class ImageRotator {
         }
     }
 
-    browseForFolder() {
-        // In a real Windows app, this would open a native folder dialog
-        // For web app, we'll show a helpful message
-        this.showBrowseMessage('For security reasons, web browsers cannot open system folder dialogs. Please copy and paste the folder path manually.');
-    }
 
-    showBrowseMessage(message) {
-        // Create a temporary info message (less alarming than error)
-        const infoEl = document.createElement('div');
-        infoEl.className = 'info-message';
-        infoEl.innerHTML = `
-            <i class="fas fa-info-circle"></i>
-            <span>${escapeHtml(message)}</span>
-        `;
-        infoEl.style.cssText = `
-            background: linear-gradient(135deg, #17a2b8, #138496);
-            color: white;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        `;
-        
-        // Insert into modal body
-        const modalBody = document.querySelector('.modal-body');
-        modalBody.insertBefore(infoEl, modalBody.firstChild);
-        
-        // Animate in
-        setTimeout(() => infoEl.style.opacity = '1', 10);
-        
-        // Remove after 4 seconds
-        setTimeout(() => {
-            infoEl.style.opacity = '0';
-            setTimeout(() => {
-                if (infoEl.parentNode) {
-                    infoEl.parentNode.removeChild(infoEl);
-                }
-            }, 300);
-        }, 4000);
-    }
 
     selectCommonFolder(folderType) {
         const commonPaths = {
@@ -340,7 +296,7 @@ class ImageRotator {
         const thumbnailUrl = `/api/thumbnail/${encodeURIComponent(image.relativePath)}?t=${Date.now()}`;
 
         card.innerHTML = `
-            <div class="image-thumbnail" onclick="imageRotator.rotateImage(${index}, 90)">
+            <div class="image-thumbnail" onclick="imageManipulator.rotateImage(${index}, 90)">
                 <img src="${thumbnailUrl}" alt="${escapeHtml(image.filename)}" loading="lazy">
                 <div class="rotation-overlay">
                     <i class="fas fa-redo-alt"></i>
@@ -351,13 +307,13 @@ class ImageRotator {
                     ${escapeHtml(image.filename)}
                 </div>
                 <div class="image-controls">
-                    <button class="btn-rotate btn-rotate-ccw" onclick="imageRotator.rotateImage(${index}, -90)" title="Rotate Counter-Clockwise">
+                    <button class="btn-rotate btn-rotate-ccw" onclick="imageManipulator.rotateImage(${index}, -90)" title="Rotate Counter-Clockwise">
                         <i class="fas fa-undo-alt"></i>
                     </button>
-                    <button class="btn-rotate btn-rotate-flip" onclick="imageRotator.rotateImage(${index}, 180)" title="Flip 180°">
+                    <button class="btn-rotate btn-rotate-flip" onclick="imageManipulator.rotateImage(${index}, 180)" title="Flip 180°">
                         <i class="fas fa-sync-alt"></i>
                     </button>
-                    <button class="btn-rotate btn-rotate-cw" onclick="imageRotator.rotateImage(${index}, 90)" title="Rotate Clockwise">
+                    <button class="btn-rotate btn-rotate-cw" onclick="imageManipulator.rotateImage(${index}, 90)" title="Rotate Clockwise">
                         <i class="fas fa-redo-alt"></i>
                     </button>
                 </div>
@@ -401,6 +357,10 @@ class ImageRotator {
             const buttons = card.querySelectorAll('.btn-rotate');
             buttons.forEach(btn => btn.disabled = true);
 
+            // Create abort controller for request timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+            
             const response = await fetch('/api/rotate', {
                 method: 'POST',
                 headers: {
@@ -410,7 +370,10 @@ class ImageRotator {
                     imagePath: image.relativePath,
                     degrees: degrees
                 }),
+                signal: controller.signal
             });
+            
+            clearTimeout(timeoutId);
 
             const result = await response.json();
 
@@ -444,11 +407,29 @@ class ImageRotator {
                 });
                 
             } else {
-                this.showError('Failed to rotate image: ' + result.error);
+                // Handle different types of server errors
+                const errorMsg = result.error || 'Unknown error';
+                if (errorMsg.includes('locked') || errorMsg.includes('busy')) {
+                    this.showError('File is temporarily locked - please wait and try again');
+                } else if (errorMsg.includes('permission') || errorMsg.includes('access')) {
+                    this.showError('File access denied - please check file permissions');
+                } else if (errorMsg.includes('not found')) {
+                    this.showError('Image file not found - please refresh the page');
+                } else {
+                    this.showError('Failed to rotate image: ' + errorMsg);
+                }
             }
         } catch (error) {
             console.error('Error rotating image:', error);
-            this.showError('Network error - please check your connection');
+            
+            // Handle different types of network/fetch errors
+            if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                this.showError('Network error - please check your connection');
+            } else if (error.name === 'AbortError') {
+                this.showError('Request timed out - please try again');
+            } else {
+                this.showError('Connection error - server may be unavailable');
+            }
         } finally {
             // Add a small delay before re-enabling buttons to prevent rapid clicking issues
             setTimeout(() => {
@@ -671,13 +652,13 @@ function escapeHtml(text) {
 }
 
 // Initialize the app
-const imageRotator = new ImageRotator();
+const imageManipulator = new ImageManipulator();
 
 // Add keyboard shortcuts
 document.addEventListener('keydown', (e) => {
     if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
         e.preventDefault();
-        window.imageRotator.loadImages();
+        window.imageManipulator.loadImages();
     }
     
     // Close preview with Escape key (for any hover previews)

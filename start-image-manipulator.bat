@@ -1,12 +1,12 @@
 @echo off
 setlocal EnableDelayedExpansion
 
-:: Image Rotator - Automated Launch Script
+:: Image Manipulator - Automated Launch Script
 :: PAPESLAY - Comprehensive server management with auto-launch and cleanup
 
 echo.
 echo ========================================
-echo   Image Rotator - Auto Launcher
+echo   Image Manipulator - Auto Launcher
 echo ========================================
 echo.
 
@@ -64,7 +64,7 @@ if "%CHROME_PATH%"=="" (
 
 :: Start the server in background
 echo.
-echo Starting Image Rotator server...
+echo Starting Image Manipulator server...
 start /B /MIN cmd /c "node server.js > server.log 2>&1"
 
 :: Wait for server to start
@@ -73,7 +73,7 @@ timeout /t 3 /nobreak >nul
 
 :: Launch browser with the application
 echo.
-echo Launching Image Rotator in browser...
+echo Launching Image Manipulator in browser...
 echo URL: http://localhost:3000
 
 if "%CHROME_PATH%"=="start" (
@@ -84,7 +84,7 @@ if "%CHROME_PATH%"=="start" (
 
 echo.
 echo ========================================
-echo  Image Rotator is now running!
+echo  Image Manipulator is now running!
 echo ========================================
 echo.
 echo Instructions:
@@ -113,7 +113,7 @@ taskkill /f /im node.exe >nul 2>&1
 
 echo Server stopped successfully
 echo.
-echo Thank you for using Image Rotator!
+echo Thank you for using Image Manipulator!
 timeout /t 2 /nobreak >nul
 
 exit /b 0

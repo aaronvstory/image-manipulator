@@ -1,6 +1,6 @@
 # 📁 Sample Images Directory
 
-This directory is provided as a default location for testing the Image Rotator application.
+This directory is provided as a default location for testing the Image Manipulator application.
 
 ## 📝 Purpose
 

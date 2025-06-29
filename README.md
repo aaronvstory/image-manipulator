@@ -1,4 +1,4 @@
-# 🔄 Image Rotator - Professional Bulk Image Rotation Tool
+# 🔄 Image Manipulator - Professional Bulk Image Rotation Tool
 
 [![GitHub stars](https://img.shields.io/github/stars/aaronvstory/image-manipulator?style=social)](https://github.com/aaronvstory/image-manipulator)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -6,7 +6,7 @@
 
 A beautiful, efficient web application for bulk image rotation with thumbnail grid view, dynamic folder selection, and intelligent hover previews. Perfect for photographers, content creators, and anyone needing to quickly review and rotate hundreds of images with an intuitive interface.
 
-![Image Rotator Screenshot](https://via.placeholder.com/800x400/1e293b/e2e8f0?text=Image+Rotator+Interface)
+![Image Manipulator Screenshot](https://via.placeholder.com/800x400/1e293b/e2e8f0?text=Image+Manipulator+Interface)
 
 ## ✨ Key Features
 
@@ -134,7 +134,7 @@ image-manipulator/
 ├── 📦 package.json           # Dependencies
 ├── 📖 README.md              # This file
 ├── 📋 CHANGELOG.md           # Version history
-└── 🚀 start-image-rotator.bat # Windows quick start
+└── 🚀 start-image-manipulator.bat # Windows quick start
 ```
 
 ## 🎨 UI Features Deep Dive

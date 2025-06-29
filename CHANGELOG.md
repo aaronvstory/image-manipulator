@@ -1,6 +1,6 @@
 # 📋 Changelog
 
-All notable changes to the Image Rotator project will be documented in this file.
+All notable changes to the Image Manipulator project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🎉 Major Release - Complete UX Overhaul
 
-This version represents a complete transformation of the Image Rotator with professional-grade features, modern UI, and intelligent user experience improvements.
+This version represents a complete transformation of the Image Manipulator with professional-grade features, modern UI, and intelligent user experience improvements.
 
 ### ✨ Added
 - **180° Flip Button**: New blue circular button for instant image flipping
@@ -97,7 +97,7 @@ This version represents a complete transformation of the Image Rotator with prof
 
 ### 🎊 Initial Release
 
-The first version of Image Rotator with core functionality.
+The first version of Image Manipulator with core functionality.
 
 ### Added
 - **Basic Image Rotation**: 90° clockwise rotation by clicking thumbnails  
