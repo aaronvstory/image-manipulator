@@ -1,5 +1,5 @@
 @echo off
-:: Test script for Image Manipulator functionality
+:: Test script for Image Manipulator v2.0 functionality
 :: PAPESLAY - Automated testing
 
 echo.

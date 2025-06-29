@@ -1,3 +1,5 @@
+# Image Manipulator v2.0 - Git Ignore Rules
+
 # Dependencies
 node_modules/
 npm-debug.log*

@@ -1,3 +1,4 @@
+// Image Manipulator v2.0 - Client-side JavaScript Application
 class ImageManipulator {
     constructor() {
         this.images = [];
@@ -115,8 +116,6 @@ class ImageManipulator {
             this.hideLoading();
         }
     }
-
-
 
     async loadImages() {
         try {
