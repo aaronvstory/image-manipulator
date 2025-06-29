@@ -17,9 +17,9 @@ A beautiful, efficient web application for bulk image rotation with thumbnail gr
 - **Visual Feedback**: Instant success/error notifications with countdown timers
 
 ### 📁 Dynamic Folder Management
-- **Universal Folder Browser**: Select any folder on your Windows system
+- **Direct Path Input**: Simply type or paste any folder path on your Windows system
 - **Recursive Scanning**: Automatically finds all images in subdirectories
-- **Common Folder Shortcuts**: Quick access to Pictures, Downloads, Desktop, Documents
+- **Instant Loading**: Quick scan and load with a single click
 - **Real-time Validation**: Automatic path validation and error handling
 
 ### 🖼️ Advanced Image Preview
@@ -74,10 +74,10 @@ The application will be available at **http://localhost:3000**
 ## 🎮 How to Use
 
 ### 1. 📂 Select Your Images
-- Click **"Select Folder"** to open the folder browser
-- Enter a path manually or use quick shortcuts
-- Browse to any folder containing images
-- Click **"Load"** to scan for images
+- Enter your folder path directly in the input field (e.g., `C:\Photos\Vacation`)
+- Click **"Load"** to scan for images in that directory
+- Use **"Refresh"** to reload the current directory
+- All subdirectories are automatically scanned for images
 
 ### 2. 🔧 Adjust Your View
 - Use the **Grid Size** slider to resize thumbnails (100px - 400px)
