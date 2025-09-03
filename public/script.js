@@ -5,6 +5,7 @@ class ImageManipulator {
         this.currentDirectory = '';
         this.lastRotationTime = {};
         this.rotationCooldown = 3000; // 3 seconds cooldown per image
+        this.hoverDelayMs = 2000; // Default 2 seconds, now configurable
         this.init();
     }
 
@@ -55,6 +56,38 @@ class ImageManipulator {
             imageGrid.style.setProperty('--grid-size', `${size}px`);
             gridValue.textContent = `${size}px`;
         });
+
+        // Setup hover delay controls
+        const hoverSlider = document.getElementById('hoverDelay');
+        const hoverValue = document.getElementById('hoverDelayValue');
+        const hoverInput = document.getElementById('hoverDelayInput');
+
+        // Helper function to update all hover delay displays
+        const updateHoverDelay = (delayMs) => {
+            this.hoverDelayMs = delayMs;
+            const seconds = (delayMs / 1000).toFixed(1);
+            hoverValue.textContent = delayMs === 0 ? 'Instant' : `${seconds}s`;
+            hoverInput.value = seconds;
+            hoverSlider.value = delayMs;
+        };
+
+        // Handle hover delay slider changes
+        hoverSlider.addEventListener('input', (e) => {
+            const delayMs = parseInt(e.target.value);
+            updateHoverDelay(delayMs);
+        });
+
+        // Handle hover delay input field changes
+        hoverInput.addEventListener('input', (e) => {
+            let seconds = parseFloat(e.target.value);
+            if (isNaN(seconds)) seconds = 0;
+            seconds = Math.max(0, Math.min(5, seconds)); // Clamp between 0 and 5
+            const delayMs = Math.round(seconds * 1000);
+            updateHoverDelay(delayMs);
+        });
+
+        // Set initial hover delay
+        updateHoverDelay(this.hoverDelayMs);
     }
 
     async loadCurrentDirectory() {
@@ -559,7 +592,7 @@ class ImageManipulator {
         // Mouse enter - start timer
         thumbnail.addEventListener('mouseenter', () => {
             clearHoverTimeout();
-            hoverTimeout = setTimeout(showPreview, 2000); // Reduced to 2 seconds
+            hoverTimeout = setTimeout(showPreview, this.hoverDelayMs); // Now configurable via slider
         });
 
         // Mouse leave - hide preview immediately

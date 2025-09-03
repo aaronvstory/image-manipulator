@@ -60,13 +60,22 @@
                         <input type="range" id="gridSize" class="grid-slider" min="100" max="400" value="180" step="20">
                         <span id="gridSizeValue" class="grid-value">180px</span>
                     </div>
+                    <div class="hover-controls">
+                        <label for="hoverDelay" class="hover-label">
+                            <i class="fas fa-clock"></i>
+                            Hover Delay:
+                        </label>
+                        <input type="range" id="hoverDelay" class="hover-slider" min="0" max="5000" value="2000" step="250">
+                        <span id="hoverDelayValue" class="hover-value">2.0s</span>
+                        <input type="number" id="hoverDelayInput" class="hover-input" min="0" max="5" step="0.25" value="2.0">
+                    </div>
                 </div>
             </div>
             
             <div class="help-section">
                 <div class="help-text">
                     <i class="fas fa-info-circle"></i>
-                    Click thumbnails for 90° CW rotation, use precision buttons for other angles, or hover over images to preview full picture
+                    Click thumbnails for 90° CW rotation, use precision buttons for other angles, or hover over images to preview (adjustable delay from instant to 5 seconds)
                 </div>
             </div>
         </div>

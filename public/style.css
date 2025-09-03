@@ -202,6 +202,89 @@ body {
     min-width: 45px;
 }
 
+/* Hover Delay Controls */
+.hover-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.hover-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #e2e8f0;
+}
+
+.hover-slider {
+    width: 120px;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, 
+        #374151 0%, 
+        #374151 100%);
+    outline: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.hover-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.hover-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.hover-value {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #fbbf24;
+    min-width: 50px;
+}
+
+.hover-input {
+    width: 60px;
+    padding: 0.25rem 0.5rem;
+    background: rgba(31, 41, 55, 0.5);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 6px;
+    color: #e2e8f0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.hover-input:focus {
+    border-color: #f59e0b;
+    background: rgba(31, 41, 55, 0.8);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.hover-input::-webkit-inner-spin-button,
+.hover-input::-webkit-outer-spin-button {
+    opacity: 0.5;
+}
+
 /* Help Section */
 .help-section {
     margin-top: 1rem;

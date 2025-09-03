@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hover Delay Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #60a5fa;
+        }
+        .test-results {
+            background: rgba(31, 41, 55, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .success {
+            color: #10b981;
+        }
+        .error {
+            color: #ef4444;
+        }
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Hover Delay Feature Test</h1>
+        
+        <div class="test-results">
+            <h2>Test Results:</h2>
+            <div id="testResults"></div>
+        </div>
+
+        <h2>Live Application:</h2>
+        <iframe src="http://localhost:3000" id="appFrame"></iframe>
+
+        <div class="test-results">
+            <h3>Manual Test Instructions:</h3>
+            <ol>
+                <li>Load a folder with images using the interface above</li>
+                <li>Test the hover delay slider (0-5 seconds)</li>
+                <li>Set to "Instant" (0s) - hover should show preview immediately</li>
+                <li>Set to 2.0s - hover should wait 2 seconds before showing</li>
+                <li>Set to 5.0s - hover should wait 5 seconds before showing</li>
+                <li>Use the number input field to set precise values (e.g., 1.5s)</li>
+                <li>Verify the slider and input stay synchronized</li>
+                <li>Check that moving mouse away hides preview instantly</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const results = document.getElementById('testResults');
+        
+        function addResult(test, success, message) {
+            const div = document.createElement('div');
+            div.className = `test-item ${success ? 'success' : 'error'}`;
+            div.innerHTML = `<strong>${success ? '✓' : '✗'} ${test}:</strong> ${message}`;
+            results.appendChild(div);
+        }
+
+        // Wait for iframe to load
+        document.getElementById('appFrame').onload = function() {
+            const iframeDoc = this.contentDocument || this.contentWindow.document;
+            
+            // Test 1: Check if hover delay slider exists
+            const hoverSlider = iframeDoc.getElementById('hoverDelay');
+            if (hoverSlider) {
+                addResult('Hover Delay Slider', true, 'Found in DOM');
+                
+                // Test 2: Check slider attributes
+                const min = hoverSlider.getAttribute('min');
+                const max = hoverSlider.getAttribute('max');
+                const value = hoverSlider.getAttribute('value');
+                
+                if (min === '0' && max === '5000' && value === '2000') {
+                    addResult('Slider Configuration', true, `Range: ${min}ms to ${max}ms, Default: ${value}ms`);
+                } else {
+                    addResult('Slider Configuration', false, `Unexpected values: min=${min}, max=${max}, value=${value}`);
+                }
+            } else {
+                addResult('Hover Delay Slider', false, 'Not found in DOM');
+            }
+            
+            // Test 3: Check if hover value display exists
+            const hoverValue = iframeDoc.getElementById('hoverDelayValue');
+            if (hoverValue) {
+                addResult('Hover Value Display', true, `Shows: ${hoverValue.textContent}`);
+            } else {
+                addResult('Hover Value Display', false, 'Not found in DOM');
+            }
+            
+            // Test 4: Check if number input exists
+            const hoverInput = iframeDoc.getElementById('hoverDelayInput');
+            if (hoverInput) {
+                addResult('Number Input Field', true, `Value: ${hoverInput.value}s`);
+                
+                // Test 5: Check input attributes
+                const inputMin = hoverInput.getAttribute('min');
+                const inputMax = hoverInput.getAttribute('max');
+                const inputStep = hoverInput.getAttribute('step');
+                
+                if (inputMin === '0' && inputMax === '5' && inputStep === '0.25') {
+                    addResult('Input Configuration', true, `Range: ${inputMin}-${inputMax}s, Step: ${inputStep}s`);
+                } else {
+                    addResult('Input Configuration', false, `Unexpected values: min=${inputMin}, max=${inputMax}, step=${inputStep}`);
+                }
+            } else {
+                addResult('Number Input Field', false, 'Not found in DOM');
+            }
+            
+            // Test 6: Check if help text was updated
+            const helpText = iframeDoc.querySelector('.help-text');
+            if (helpText && helpText.textContent.includes('adjustable delay')) {
+                addResult('Help Text Update', true, 'Contains information about adjustable delay');
+            } else {
+                addResult('Help Text Update', false, 'Help text not updated with new feature info');
+            }
+            
+            // Test 7: Check if CSS styles are applied
+            if (hoverSlider) {
+                const styles = this.contentWindow.getComputedStyle(hoverSlider);
+                if (styles.width === '120px') {
+                    addResult('CSS Styling', true, 'Hover slider styles applied correctly');
+                } else {
+                    addResult('CSS Styling', false, `Unexpected width: ${styles.width}`);
+                }
+            }
+        };
+    </script>
+</body>
+</html>
