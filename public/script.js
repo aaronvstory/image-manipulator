@@ -6,6 +6,12 @@ class ImageManipulator {
         this.lastRotationTime = {};
         this.rotationCooldown = 3000; // 3 seconds cooldown per image
         this.hoverDelayMs = 2000; // Default 2 seconds, now configurable
+
+        // Batch processing components
+        this.batchSelection = new BatchSelection();
+        this.batchModal = new BatchModal();
+        this.batchProgressClient = new BatchProgress();
+
         this.init();
     }
 
@@ -13,6 +19,7 @@ class ImageManipulator {
         this.bindEvents();
         this.loadCurrentDirectory();
         this.setupGridControls();
+        this.setupBatchControls();
     }
 
     bindEvents() {
@@ -38,6 +45,85 @@ class ImageManipulator {
                 }
             }
         });
+    }
+
+    setupBatchControls() {
+        // Batch selection change handler
+        this.batchSelection.onChange((selectionInfo) => {
+            this.updateBatchUI(selectionInfo);
+        });
+
+        // Select All button
+        document.getElementById('selectAllBtn').addEventListener('click', () => {
+            this.batchSelection.selectAll();
+        });
+
+        // Clear Selection button
+        document.getElementById('clearSelectionBtn').addEventListener('click', () => {
+            this.batchSelection.clearAll();
+        });
+
+        // Start Batch OCR button
+        document.getElementById('startBatchOCRBtn').addEventListener('click', () => {
+            this.startBatchOCR();
+        });
+    }
+
+    updateBatchUI(selectionInfo) {
+        const count = selectionInfo.count;
+
+        // Update selection count
+        document.getElementById('selectionCount').textContent = count;
+
+        // Enable/disable Start Batch button
+        const startBtn = document.getElementById('startBatchOCRBtn');
+        startBtn.disabled = count === 0;
+
+        // Update all checkboxes
+        this.images.forEach(image => {
+            const checkbox = document.querySelector(`input[data-image-path="${image.fullPath}"]`);
+            if (checkbox) {
+                checkbox.checked = this.batchSelection.isSelected(image.fullPath);
+            }
+        });
+    }
+
+    async startBatchOCR() {
+        const selectedItems = this.batchSelection.getSelectedItems(this.images);
+
+        if (selectedItems.length === 0) {
+            this.showError('No images selected');
+            return;
+        }
+
+        try {
+            // Create batch job
+            const response = await fetch('/api/batch/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    items: selectedItems,
+                    options: {
+                        chunkSize: 50,
+                        overwrite: 'skip'
+                    }
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Open modal and start progress tracking
+                this.batchModal.open(data.jobId, this.batchProgressClient);
+            } else {
+                this.showError('Failed to start batch OCR: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error starting batch OCR:', error);
+            this.showError('Failed to start batch OCR');
+        }
     }
 
     setupGridControls() {
@@ -248,20 +334,28 @@ class ImageManipulator {
 
     renderImages() {
         const grid = document.getElementById('imageGrid');
-        
+
         if (this.images.length === 0) {
             grid.classList.add('hidden');
             document.getElementById('emptyState').classList.remove('hidden');
+            document.getElementById('batchControlsSection').classList.add('hidden');
             return;
         }
 
         grid.classList.remove('hidden');
         grid.innerHTML = '';
 
+        // Initialize batch selection with image IDs
+        const imageIds = this.images.map(img => img.fullPath);
+        this.batchSelection.setAvailableImages(imageIds);
+
         this.images.forEach((image, index) => {
             const imageCard = this.createImageCard(image, index);
             grid.appendChild(imageCard);
         });
+
+        // Show batch controls
+        document.getElementById('batchControlsSection').classList.remove('hidden');
     }
 
     createImageCard(image, index) {
@@ -270,8 +364,16 @@ class ImageManipulator {
         card.dataset.index = index;
 
         const thumbnailUrl = `/api/thumbnail/${encodeURIComponent(image.relativePath)}?t=${Date.now()}`;
+        const isSelected = this.batchSelection.isSelected(image.fullPath);
 
         card.innerHTML = `
+            <div class="batch-checkbox-container">
+                <input type="checkbox"
+                       class="batch-checkbox"
+                       data-image-path="${image.fullPath}"
+                       ${isSelected ? 'checked' : ''}
+                       onclick="imageManipulator.toggleImageSelection('${image.fullPath}')">
+            </div>
             <div class="image-thumbnail" onclick="imageManipulator.rotateImage(${index}, 90)">
                 <img src="${thumbnailUrl}" alt="${escapeHtml(image.filename)}" loading="lazy">
                 <div class="rotation-overlay">
@@ -300,6 +402,10 @@ class ImageManipulator {
         this.setupHoverPreview(card, image);
 
         return card;
+    }
+
+    toggleImageSelection(imagePath) {
+        this.batchSelection.toggleImage(imagePath);
     }
 
     async rotateImage(index, degrees) {

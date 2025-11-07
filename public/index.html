@@ -78,6 +78,30 @@
                     Click thumbnails for 90° CW rotation, use precision buttons for other angles, or hover over images to preview (adjustable delay from instant to 5 seconds)
                 </div>
             </div>
+
+            <!-- Batch Controls -->
+            <div class="batch-controls-section hidden" id="batchControlsSection">
+                <div class="batch-selection-controls">
+                    <button id="selectAllBtn" class="btn btn-secondary">
+                        <i class="fas fa-check-double"></i>
+                        Select All
+                    </button>
+                    <button id="clearSelectionBtn" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Clear Selection
+                    </button>
+                    <span id="selectionBadge" class="selection-badge">
+                        <i class="fas fa-images"></i>
+                        <span id="selectionCount">0</span> selected
+                    </span>
+                </div>
+                <div class="batch-action-controls">
+                    <button id="startBatchOCRBtn" class="btn btn-primary" disabled>
+                        <i class="fas fa-cogs"></i>
+                        Start Batch OCR
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Main Content -->
@@ -109,6 +133,10 @@
         </main>
     </div>
 
+    <!-- Batch Processing Scripts -->
+    <script src="js/batch-selection.js"></script>
+    <script src="js/batch-progress.js"></script>
+    <script src="js/batch-modal.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
