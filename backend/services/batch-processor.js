@@ -6,11 +6,13 @@
 const { ITEM_STATUS } = require('./batch-manager');
 const { shouldSkipImage } = require('./skip-detector');
 const { saveOCRResults } = require('./result-saver');
+const { OCRProvider } = require('./ocr-provider');
 
 class BatchProcessor {
   constructor(batchManager) {
     this.batchManager = batchManager;
     this.processingJobs = new Set(); // Track active jobs
+    this.ocrProvider = new OCRProvider(); // Real OCR provider
   }
 
   /**
@@ -143,41 +145,44 @@ class BatchProcessor {
   }
 
   /**
-   * Perform OCR on an image
-   * PLACEHOLDER - Replace with actual OCR implementation
+   * Perform OCR on an image using OpenRouter vision API
    * @param {string} imagePath
    * @param {Object} options
    * @returns {Promise<Object>}
    */
   async performOCR(imagePath, options) {
-    // Simulate OCR processing time
-    await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
+    console.log(`🔍 BatchProcessor: Starting OCR for ${imagePath}`);
 
-    // PLACEHOLDER: Return mock OCR results
-    // In real implementation, this would call Tesseract.js, Claude Vision API, etc.
-    const mockResult = {
-      text: `Mock OCR result for: ${imagePath.split('/').pop()}`,
-      confidence: 0.85 + Math.random() * 0.15,
-      modelUsed: 'placeholder-ocr-v1',
+    try {
+      // Initialize OCR provider if needed
+      if (!this.ocrProvider.initialized) {
+        await this.ocrProvider.initialize();
+      }
 
-      // Mock structured data (driver's license fields)
-      firstName: 'John',
-      middleName: 'Michael',
-      lastName: 'Doe',
-      licenseNumber: `DL${Math.floor(Math.random() * 1000000)}`,
-      dateOfBirth: '1990-01-15',
-      expirationDate: '2028-01-15',
-      state: 'CA',
+      // Process image with real OCR
+      const result = await this.ocrProvider.processImage(imagePath, options);
 
-      // Raw text
-      rawText: 'DRIVER LICENSE\nJOHN MICHAEL DOE\nDL123456\nDOB: 01/15/1990\nEXP: 01/15/2028\nCLASS: C\nSTATE: CALIFORNIA',
+      if (!result.success) {
+        throw new Error(result.error || 'OCR processing failed');
+      }
 
-      // Processing metadata
-      processedAt: new Date().toISOString(),
-      processingTimeMs: Math.floor(500 + Math.random() * 1000)
-    };
+      // Parse and validate result
+      const parsedData = this.ocrProvider.parseResult(result.data);
 
-    return mockResult;
+      // Return in expected format
+      return {
+        ...parsedData,
+        modelUsed: result.metadata.model,
+        processedAt: result.metadata.processedAt,
+        processingTimeMs: result.metadata.processingTime,
+        cost: result.metadata.cost,
+        usage: result.metadata.usage
+      };
+
+    } catch (error) {
+      console.error(`❌ BatchProcessor: OCR failed for ${imagePath}:`, error.message);
+      throw error;
+    }
   }
 }
 

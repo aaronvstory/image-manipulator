@@ -69,3 +69,6 @@ temp/
 # Build outputs
 dist/
 build/
+.env
+server.log
+nohup.out

@@ -1,4 +1,7 @@
 // Image Manipulator v2.0 - Express Server with Image Processing
+// Load environment variables
+require('dotenv').config();
+
 const express = require('express');
 const sharp = require('sharp');
 const fs = require('fs').promises;
