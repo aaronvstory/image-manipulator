@@ -380,9 +380,13 @@ app.post('/api/rotate', async (req, res) => {
     }
 });
 
+// Batch OCR routes
+const batchRoutes = require('./backend/routes/batch');
+app.use('/api/batch', batchRoutes);
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`\n🎨 Image Manipulator Server running at http://localhost:${PORT}`);
     console.log(`📁 Current directory: ${IMAGE_DIR}`);
-    console.log('🚀 Ready for image rotation!\n');
+    console.log('🚀 Ready for image rotation and batch OCR!\n');
 });
