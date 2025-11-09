@@ -5,7 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { BatchManager, ITEM_STATUS, JOB_STATUS } = require('../services/batch-manager');
+const { BatchManager } = require('../services/batch-manager');
 const { BatchProcessor } = require('../services/batch-processor');
 
 // Initialize batch manager and processor

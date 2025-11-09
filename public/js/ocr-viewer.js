@@ -12,6 +12,14 @@ class OCRViewer {
     this.init();
   }
 
+  // HTML escape utility to prevent XSS
+  escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   init() {
     this.modal = document.getElementById('ocrViewerModal');
     this.bindEvents();
@@ -143,8 +151,8 @@ class OCRViewer {
         <div class="field">
           <div class="field-label">Name:</div>
           <div class="field-value">
-            ${this.formatName(data)}
-            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.formatName(data)}')">
+            ${this.escapeHtml(this.formatName(data))}
+            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.escapeHtml(this.formatName(data)).replace(/'/g, "\\'")}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
@@ -152,8 +160,8 @@ class OCRViewer {
         <div class="field">
           <div class="field-label">Date of Birth:</div>
           <div class="field-value">
-            ${data.dateOfBirth || 'N/A'}
-            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${data.dateOfBirth || ''}')">
+            ${this.escapeHtml(data.dateOfBirth) || 'N/A'}
+            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.escapeHtml(data.dateOfBirth || '').replace(/'/g, "\\'")}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
@@ -161,8 +169,8 @@ class OCRViewer {
         <div class="field">
           <div class="field-label">Sex:</div>
           <div class="field-value">
-            ${data.sex || 'N/A'}
-            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${data.sex || ''}')">
+            ${this.escapeHtml(data.sex) || 'N/A'}
+            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.escapeHtml(data.sex || '').replace(/'/g, "\\'")}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
@@ -174,8 +182,8 @@ class OCRViewer {
         <div class="field">
           <div class="field-label">License Number:</div>
           <div class="field-value">
-            ${data.licenseNumber || 'N/A'}
-            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${data.licenseNumber || ''}')">
+            ${this.escapeHtml(data.licenseNumber) || 'N/A'}
+            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.escapeHtml(data.licenseNumber || '').replace(/'/g, "\\'")}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
@@ -183,8 +191,8 @@ class OCRViewer {
         <div class="field">
           <div class="field-label">State:</div>
           <div class="field-value">
-            ${data.state || 'N/A'}
-            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${data.state || ''}')">
+            ${this.escapeHtml(data.state) || 'N/A'}
+            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.escapeHtml(data.state || '').replace(/'/g, "\\'")}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
@@ -192,8 +200,8 @@ class OCRViewer {
         <div class="field">
           <div class="field-label">Class:</div>
           <div class="field-value">
-            ${data.documentClass || 'N/A'}
-            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${data.documentClass || ''}')">
+            ${this.escapeHtml(data.documentClass) || 'N/A'}
+            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.escapeHtml(data.documentClass || '').replace(/'/g, "\\'")}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
@@ -201,8 +209,8 @@ class OCRViewer {
         <div class="field">
           <div class="field-label">Issue Date:</div>
           <div class="field-value">
-            ${data.issueDate || 'N/A'}
-            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${data.issueDate || ''}')">
+            ${this.escapeHtml(data.issueDate) || 'N/A'}
+            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.escapeHtml(data.issueDate || '').replace(/'/g, "\\'")}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
@@ -210,8 +218,8 @@ class OCRViewer {
         <div class="field">
           <div class="field-label">Expiration:</div>
           <div class="field-value">
-            ${data.expirationDate || 'N/A'}
-            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${data.expirationDate || ''}')">
+            ${this.escapeHtml(data.expirationDate) || 'N/A'}
+            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.escapeHtml(data.expirationDate || '').replace(/'/g, "\\'")}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
@@ -223,8 +231,8 @@ class OCRViewer {
         <div class="field">
           <div class="field-label">Street:</div>
           <div class="field-value">
-            ${data.address || 'N/A'}
-            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${(data.address || '').replace(/'/g, "\\'")}')">
+            ${this.escapeHtml(data.address) || 'N/A'}
+            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.escapeHtml(data.address || '').replace(/'/g, "\\'")}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
@@ -232,8 +240,8 @@ class OCRViewer {
         <div class="field">
           <div class="field-label">City:</div>
           <div class="field-value">
-            ${data.city || 'N/A'}
-            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${data.city || ''}')">
+            ${this.escapeHtml(data.city) || 'N/A'}
+            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.escapeHtml(data.city || '').replace(/'/g, "\\'")}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
@@ -241,8 +249,8 @@ class OCRViewer {
         <div class="field">
           <div class="field-label">Zip Code:</div>
           <div class="field-value">
-            ${data.zipCode || 'N/A'}
-            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${data.zipCode || ''}')">
+            ${this.escapeHtml(data.zipCode) || 'N/A'}
+            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.escapeHtml(data.zipCode || '').replace(/'/g, "\\'")}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
@@ -254,8 +262,8 @@ class OCRViewer {
         <div class="field">
           <div class="field-label">Height:</div>
           <div class="field-value">
-            ${data.height || 'N/A'}
-            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${data.height || ''}')">
+            ${this.escapeHtml(data.height) || 'N/A'}
+            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.escapeHtml(data.height || '').replace(/'/g, "\\'")}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
@@ -263,8 +271,8 @@ class OCRViewer {
         <div class="field">
           <div class="field-label">Weight:</div>
           <div class="field-value">
-            ${data.weight || 'N/A'}
-            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${data.weight || ''}')">
+            ${this.escapeHtml(data.weight) || 'N/A'}
+            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.escapeHtml(data.weight || '').replace(/'/g, "\\'")}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
@@ -272,8 +280,8 @@ class OCRViewer {
         <div class="field">
           <div class="field-label">Eye Color:</div>
           <div class="field-value">
-            ${data.eyeColor || 'N/A'}
-            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${data.eyeColor || ''}')">
+            ${this.escapeHtml(data.eyeColor) || 'N/A'}
+            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.escapeHtml(data.eyeColor || '').replace(/'/g, "\\'")}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
@@ -281,8 +289,8 @@ class OCRViewer {
         <div class="field">
           <div class="field-label">Hair Color:</div>
           <div class="field-value">
-            ${data.hairColor || 'N/A'}
-            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${data.hairColor || ''}')">
+            ${this.escapeHtml(data.hairColor) || 'N/A'}
+            <button class="field-copy-btn" onclick="window.ocrViewer.copyField('${this.escapeHtml(data.hairColor || '').replace(/'/g, "\\'")}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>

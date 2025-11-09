@@ -411,6 +411,31 @@ app.post('/api/rotate', async (req, res) => {
     }
 });
 
+// Helper function to validate OCR result file paths
+function validateOCRPath(filePath) {
+    // Ensure IMAGE_DIR is set
+    if (!IMAGE_DIR) {
+        return { valid: false, error: 'No image directory configured' };
+    }
+
+    // Resolve the absolute path and normalize it
+    const absolutePath = path.resolve(filePath);
+    const normalizedImageDir = path.resolve(IMAGE_DIR);
+
+    // Check if path is within IMAGE_DIR
+    if (!absolutePath.startsWith(normalizedImageDir)) {
+        return { valid: false, error: 'Path must be within image directory' };
+    }
+
+    // Check if it's an OCR results file
+    const filename = path.basename(absolutePath);
+    if (!filename.endsWith('_ocr_results.json') && !filename.endsWith('_ocr_results.txt')) {
+        return { valid: false, error: 'Invalid OCR results file' };
+    }
+
+    return { valid: true, path: absolutePath };
+}
+
 // OCR Results API
 app.get('/api/ocr-results', async (req, res) => {
     try {
@@ -421,7 +446,13 @@ app.get('/api/ocr-results', async (req, res) => {
             return res.status(400).json({ error: 'Path parameter required' });
         }
 
-        const content = await fs.readFile(filePath, 'utf-8');
+        // Validate path to prevent traversal attacks
+        const validation = validateOCRPath(filePath);
+        if (!validation.valid) {
+            return res.status(403).json({ error: validation.error });
+        }
+
+        const content = await fs.readFile(validation.path, 'utf-8');
 
         if (isRaw) {
             res.type('text/plain').send(content);
@@ -436,13 +467,19 @@ app.get('/api/ocr-results', async (req, res) => {
 
 app.post('/api/ocr-results/save', async (req, res) => {
     try {
-        const { path: filePath, content, type } = req.body;
+        const { path: filePath, content } = req.body;
 
         if (!filePath || !content) {
             return res.status(400).json({ error: 'Path and content required' });
         }
 
-        await fs.writeFile(filePath, content, 'utf-8');
+        // Validate path to prevent traversal attacks
+        const validation = validateOCRPath(filePath);
+        if (!validation.valid) {
+            return res.status(403).json({ error: validation.error });
+        }
+
+        await fs.writeFile(validation.path, content, 'utf-8');
 
         res.json({ success: true, message: 'File saved successfully' });
     } catch (error) {
@@ -460,5 +497,5 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`\n🎨 Image Manipulator Server running at http://localhost:${PORT}`);
     console.log(`📁 Current directory: ${IMAGE_DIR}`);
     console.log('🚀 Ready for image rotation and batch OCR!\n');
-    console.log('💡 From Windows, access at: http://localhost:3000\n');
+    console.log(`💡 From Windows, access at: http://localhost:${PORT}\n`);
 });

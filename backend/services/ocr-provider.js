@@ -34,7 +34,6 @@ class OCRProvider {
     }
 
     console.log('🔧 OCRProvider: Initializing OpenRouter client...');
-    console.log(`🔑 API key: ${apiKey.substring(0, 20)}...${apiKey.substring(apiKey.length - 4)}`);
     console.log(`🌐 Base URL: ${this.config.baseURL}`);
     console.log(`📋 Default model: ${this.config.defaultModel}`);
 
