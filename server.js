@@ -8,7 +8,7 @@ const fs = require('fs').promises;
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3001;
 
 // Serve static files from public directory
 app.use(express.static('public'));
@@ -27,35 +27,53 @@ function isImageFile(filename) {
     return SUPPORTED_EXTENSIONS.includes(ext);
 }
 
+// Check if OCR results exist for an image
+async function hasOCRResults(imagePath) {
+    const ext = path.extname(imagePath);
+    const basePath = imagePath.slice(0, -ext.length);
+    const ocrResultPath = `${basePath}_ocr_results.json`;
+
+    try {
+        await fs.access(ocrResultPath);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 // Recursively scan directory for images
 async function scanImagesRecursively(dirPath) {
     let images = [];
-    
+
     try {
         const items = await fs.readdir(dirPath, { withFileTypes: true });
-        
+
         for (const item of items) {
             const fullPath = path.join(dirPath, item.name);
-            
+
             if (item.isDirectory()) {
                 // Recursively scan subdirectories
                 const subImages = await scanImagesRecursively(fullPath);
                 images.push(...subImages);
             } else if (isImageFile(item.name)) {
+                // Check if OCR results exist
+                const hasOCR = await hasOCRResults(fullPath);
+
                 // Add image with relative path info
                 const relativePath = path.relative(IMAGE_DIR, fullPath);
                 images.push({
                     filename: item.name,
                     fullPath: fullPath,
                     relativePath: relativePath,
-                    directory: path.dirname(relativePath)
+                    directory: path.dirname(relativePath),
+                    hasOCRResults: hasOCR
                 });
             }
         }
     } catch (error) {
         console.error(`Error scanning directory ${dirPath}:`, error);
     }
-    
+
     return images;
 }
 
@@ -271,9 +289,19 @@ app.post('/api/directory', async (req, res) => {
 // Get all images from the directory
 app.get('/api/images', async (req, res) => {
     try {
+        // Return empty array if no directory is set
+        if (!IMAGE_DIR) {
+            return res.json({
+                success: true,
+                count: 0,
+                images: [],
+                directory: null
+            });
+        }
+
         console.log('Scanning for images...');
         const images = await scanImagesRecursively(IMAGE_DIR);
-        
+
         console.log(`Found ${images.length} images`);
         res.json({
             success: true,
@@ -383,13 +411,54 @@ app.post('/api/rotate', async (req, res) => {
     }
 });
 
+// OCR Results API
+app.get('/api/ocr-results', async (req, res) => {
+    try {
+        const filePath = req.query.path;
+        const isRaw = req.query.raw === 'true';
+
+        if (!filePath) {
+            return res.status(400).json({ error: 'Path parameter required' });
+        }
+
+        const content = await fs.readFile(filePath, 'utf-8');
+
+        if (isRaw) {
+            res.type('text/plain').send(content);
+        } else {
+            res.json(JSON.parse(content));
+        }
+    } catch (error) {
+        console.error('Error reading OCR results:', error);
+        res.status(500).json({ error: 'Failed to read OCR results' });
+    }
+});
+
+app.post('/api/ocr-results/save', async (req, res) => {
+    try {
+        const { path: filePath, content, type } = req.body;
+
+        if (!filePath || !content) {
+            return res.status(400).json({ error: 'Path and content required' });
+        }
+
+        await fs.writeFile(filePath, content, 'utf-8');
+
+        res.json({ success: true, message: 'File saved successfully' });
+    } catch (error) {
+        console.error('Error saving OCR results:', error);
+        res.status(500).json({ error: 'Failed to save OCR results' });
+    }
+});
+
 // Batch OCR routes
 const batchRoutes = require('./backend/routes/batch');
 app.use('/api/batch', batchRoutes);
 
-// Start the server
-app.listen(PORT, () => {
+// Start the server - bind to 0.0.0.0 for WSL2 Windows access
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`\n🎨 Image Manipulator Server running at http://localhost:${PORT}`);
     console.log(`📁 Current directory: ${IMAGE_DIR}`);
     console.log('🚀 Ready for image rotation and batch OCR!\n');
+    console.log('💡 From Windows, access at: http://localhost:3000\n');
 });

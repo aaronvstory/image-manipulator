@@ -6,11 +6,16 @@ class ImageManipulator {
         this.lastRotationTime = {};
         this.rotationCooldown = 3000; // 3 seconds cooldown per image
         this.hoverDelayMs = 2000; // Default 2 seconds, now configurable
+        this.currentFilter = 'all'; // all, processed, unprocessed
 
         // Batch processing components
         this.batchSelection = new BatchSelection();
         this.batchModal = new BatchModal();
         this.batchProgressClient = new BatchProgress();
+        this.ocrViewer = new OCRViewer();
+
+        // Make OCR viewer globally accessible for copy buttons
+        window.ocrViewer = this.ocrViewer;
 
         this.init();
     }
@@ -366,6 +371,14 @@ class ImageManipulator {
         const thumbnailUrl = `/api/thumbnail/${encodeURIComponent(image.relativePath)}?t=${Date.now()}`;
         const isSelected = this.batchSelection.isSelected(image.fullPath);
 
+        // Add OCR processed badge if results exist
+        const ocrBadge = image.hasOCRResults ? `
+            <div class="ocr-processed-badge" title="OCR already processed">
+                <i class="fas fa-check-circle"></i>
+                <span>OCR Done</span>
+            </div>
+        ` : '';
+
         card.innerHTML = `
             <div class="batch-checkbox-container">
                 <input type="checkbox"
@@ -374,6 +387,7 @@ class ImageManipulator {
                        ${isSelected ? 'checked' : ''}
                        onclick="imageManipulator.toggleImageSelection('${image.fullPath}')">
             </div>
+            ${ocrBadge}
             <div class="image-thumbnail" onclick="imageManipulator.rotateImage(${index}, 90)">
                 <img src="${thumbnailUrl}" alt="${escapeHtml(image.filename)}" loading="lazy">
                 <div class="rotation-overlay">
