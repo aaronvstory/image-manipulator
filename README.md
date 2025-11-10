@@ -1,5 +1,5 @@
 # 🔄 Image Manipulator - Professional Bulk Image Rotation Tool
-
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/aaronvstory/image-manipulator?utm_source=oss&utm_medium=github&utm_campaign=aaronvstory%2Fimage-manipulator&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 [![GitHub stars](https://img.shields.io/github/stars/aaronvstory/image-manipulator?style=social)](https://github.com/aaronvstory/image-manipulator)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
