@@ -1,11 +1,14 @@
 // Image Manipulator v2.0 - Express Server with Image Processing
+// Load environment variables
+require('dotenv').config();
+
 const express = require('express');
 const sharp = require('sharp');
 const fs = require('fs').promises;
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3001;
 
 // Serve static files from public directory
 app.use(express.static('public'));
@@ -24,35 +27,53 @@ function isImageFile(filename) {
     return SUPPORTED_EXTENSIONS.includes(ext);
 }
 
+// Check if OCR results exist for an image
+async function hasOCRResults(imagePath) {
+    const ext = path.extname(imagePath);
+    const basePath = imagePath.slice(0, -ext.length);
+    const ocrResultPath = `${basePath}_ocr_results.json`;
+
+    try {
+        await fs.access(ocrResultPath);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 // Recursively scan directory for images
 async function scanImagesRecursively(dirPath) {
     let images = [];
-    
+
     try {
         const items = await fs.readdir(dirPath, { withFileTypes: true });
-        
+
         for (const item of items) {
             const fullPath = path.join(dirPath, item.name);
-            
+
             if (item.isDirectory()) {
                 // Recursively scan subdirectories
                 const subImages = await scanImagesRecursively(fullPath);
                 images.push(...subImages);
             } else if (isImageFile(item.name)) {
+                // Check if OCR results exist
+                const hasOCR = await hasOCRResults(fullPath);
+
                 // Add image with relative path info
                 const relativePath = path.relative(IMAGE_DIR, fullPath);
                 images.push({
                     filename: item.name,
                     fullPath: fullPath,
                     relativePath: relativePath,
-                    directory: path.dirname(relativePath)
+                    directory: path.dirname(relativePath),
+                    hasOCRResults: hasOCR
                 });
             }
         }
     } catch (error) {
         console.error(`Error scanning directory ${dirPath}:`, error);
     }
-    
+
     return images;
 }
 
@@ -268,9 +289,19 @@ app.post('/api/directory', async (req, res) => {
 // Get all images from the directory
 app.get('/api/images', async (req, res) => {
     try {
+        // Return empty array if no directory is set
+        if (!IMAGE_DIR) {
+            return res.json({
+                success: true,
+                count: 0,
+                images: [],
+                directory: null
+            });
+        }
+
         console.log('Scanning for images...');
         const images = await scanImagesRecursively(IMAGE_DIR);
-        
+
         console.log(`Found ${images.length} images`);
         res.json({
             success: true,
@@ -380,9 +411,91 @@ app.post('/api/rotate', async (req, res) => {
     }
 });
 
-// Start the server
-app.listen(PORT, () => {
+// Helper function to validate OCR result file paths
+function validateOCRPath(filePath) {
+    // Ensure IMAGE_DIR is set
+    if (!IMAGE_DIR) {
+        return { valid: false, error: 'No image directory configured' };
+    }
+
+    // Resolve the absolute path and normalize it
+    const absolutePath = path.resolve(filePath);
+    const normalizedImageDir = path.resolve(IMAGE_DIR);
+
+    // Check if path is within IMAGE_DIR
+    if (!absolutePath.startsWith(normalizedImageDir)) {
+        return { valid: false, error: 'Path must be within image directory' };
+    }
+
+    // Check if it's an OCR results file
+    const filename = path.basename(absolutePath);
+    if (!filename.endsWith('_ocr_results.json') && !filename.endsWith('_ocr_results.txt')) {
+        return { valid: false, error: 'Invalid OCR results file' };
+    }
+
+    return { valid: true, path: absolutePath };
+}
+
+// OCR Results API
+app.get('/api/ocr-results', async (req, res) => {
+    try {
+        const filePath = req.query.path;
+        const isRaw = req.query.raw === 'true';
+
+        if (!filePath) {
+            return res.status(400).json({ error: 'Path parameter required' });
+        }
+
+        // Validate path to prevent traversal attacks
+        const validation = validateOCRPath(filePath);
+        if (!validation.valid) {
+            return res.status(403).json({ error: validation.error });
+        }
+
+        const content = await fs.readFile(validation.path, 'utf-8');
+
+        if (isRaw) {
+            res.type('text/plain').send(content);
+        } else {
+            res.json(JSON.parse(content));
+        }
+    } catch (error) {
+        console.error('Error reading OCR results:', error);
+        res.status(500).json({ error: 'Failed to read OCR results' });
+    }
+});
+
+app.post('/api/ocr-results/save', async (req, res) => {
+    try {
+        const { path: filePath, content } = req.body;
+
+        if (!filePath || !content) {
+            return res.status(400).json({ error: 'Path and content required' });
+        }
+
+        // Validate path to prevent traversal attacks
+        const validation = validateOCRPath(filePath);
+        if (!validation.valid) {
+            return res.status(403).json({ error: validation.error });
+        }
+
+        await fs.writeFile(validation.path, content, 'utf-8');
+
+        res.json({ success: true, message: 'File saved successfully' });
+    } catch (error) {
+        console.error('Error saving OCR results:', error);
+        res.status(500).json({ error: 'Failed to save OCR results' });
+    }
+});
+
+// Batch OCR routes
+const batchRoutes = require('./backend/routes/batch');
+app.use('/api/batch', batchRoutes);
+
+// Start the server - bind to 0.0.0.0 for WSL2 Windows access
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`\n🎨 Image Manipulator Server running at http://localhost:${PORT}`);
     console.log(`📁 Current directory: ${IMAGE_DIR}`);
-    console.log('🚀 Ready for image rotation!\n');
+    console.log('🚀 Ready for image rotation and batch OCR!\n');
+    console.log(`💡 From Windows, access at: http://localhost:${PORT}\n`);
 });

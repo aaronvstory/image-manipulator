@@ -78,6 +78,83 @@
                     Click thumbnails for 90° CW rotation, use precision buttons for other angles, or hover over images to preview (adjustable delay from instant to 5 seconds)
                 </div>
             </div>
+
+            <!-- Batch Controls -->
+            <div class="batch-controls-section hidden" id="batchControlsSection">
+                <!-- Statistics Banner -->
+                <div class="batch-statistics">
+                    <div class="stat-item">
+                        <i class="fas fa-images"></i>
+                        <span>Total: <strong id="statTotal">0</strong></span>
+                    </div>
+                    <div class="stat-item stat-success">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Processed: <strong id="statProcessed">0</strong></span>
+                    </div>
+                    <div class="stat-item stat-pending">
+                        <i class="fas fa-clock"></i>
+                        <span>Remaining: <strong id="statRemaining">0</strong></span>
+                    </div>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="batch-filter-controls">
+                    <button id="filterAllBtn" class="filter-btn active" data-filter="all">
+                        <i class="fas fa-border-all"></i>
+                        All
+                    </button>
+                    <button id="filterProcessedBtn" class="filter-btn" data-filter="processed">
+                        <i class="fas fa-check-circle"></i>
+                        Processed
+                    </button>
+                    <button id="filterUnprocessedBtn" class="filter-btn" data-filter="unprocessed">
+                        <i class="fas fa-clock"></i>
+                        Unprocessed
+                    </button>
+                </div>
+
+                <div class="batch-selection-controls">
+                    <button id="selectAllBtn" class="btn btn-secondary">
+                        <i class="fas fa-check-double"></i>
+                        Select All
+                    </button>
+                    <button id="selectUnprocessedBtn" class="btn btn-secondary">
+                        <i class="fas fa-clock"></i>
+                        Select All Unprocessed
+                    </button>
+
+                    <!-- Preset Selector -->
+                    <div class="preset-selector">
+                        <label for="presetCount">Select Next:</label>
+                        <select id="presetCount" class="preset-dropdown">
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="custom">Custom...</option>
+                        </select>
+                        <input type="number" id="customCount" class="custom-count-input hidden" min="1" placeholder="Enter count">
+                        <button id="selectNextBtn" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-right"></i>
+                            Go
+                        </button>
+                    </div>
+
+                    <button id="clearSelectionBtn" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Clear Selection
+                    </button>
+                    <span id="selectionBadge" class="selection-badge">
+                        <i class="fas fa-images"></i>
+                        <span id="selectionCount">0</span> selected
+                    </span>
+                </div>
+                <div class="batch-action-controls">
+                    <button id="startBatchOCRBtn" class="btn btn-primary" disabled>
+                        <i class="fas fa-cogs"></i>
+                        Start Batch OCR
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Main Content -->
@@ -109,6 +186,64 @@
         </main>
     </div>
 
+    <!-- OCR Results Viewer Modal -->
+    <div id="ocrViewerModal" class="ocr-viewer-modal hidden">
+        <div class="ocr-viewer-overlay"></div>
+        <div class="ocr-viewer-content">
+            <div class="ocr-viewer-header">
+                <h2 id="ocrViewerTitle">
+                    <i class="fas fa-file-alt"></i>
+                    <span id="ocrViewerFilename">OCR Results</span>
+                </h2>
+                <button id="ocrViewerClose" class="ocr-viewer-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="ocr-viewer-body">
+                <div class="ocr-viewer-tabs">
+                    <button class="ocr-tab active" data-tab="formatted">
+                        <i class="fas fa-align-left"></i>
+                        Formatted
+                    </button>
+                    <button class="ocr-tab" data-tab="json">
+                        <i class="fas fa-code"></i>
+                        JSON
+                    </button>
+                    <button class="ocr-tab" data-tab="raw">
+                        <i class="fas fa-file-alt"></i>
+                        Raw Text
+                    </button>
+                </div>
+                <div class="ocr-viewer-content-area">
+                    <div id="ocrFormattedView" class="ocr-tab-content active">
+                        <div id="ocrFormattedData" class="ocr-formatted-display"></div>
+                    </div>
+                    <div id="ocrJsonView" class="ocr-tab-content">
+                        <textarea id="ocrJsonEditor" class="ocr-editor" spellcheck="false"></textarea>
+                    </div>
+                    <div id="ocrRawView" class="ocr-tab-content">
+                        <textarea id="ocrRawEditor" class="ocr-editor" spellcheck="false"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="ocr-viewer-footer">
+                <button id="ocrSaveBtn" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Save Changes
+                </button>
+                <button id="ocrCancelBtn" class="btn btn-secondary">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Batch Processing Scripts -->
+    <script src="js/batch-selection.js"></script>
+    <script src="js/batch-progress.js"></script>
+    <script src="js/batch-modal.js"></script>
+    <script src="js/ocr-viewer.js"></script>
     <script src="script.js"></script>
+    <script src="js/enhanced-features.js"></script>
 </body>
 </html>
