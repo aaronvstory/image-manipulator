@@ -1,0 +1,83 @@
+{
+  "env": {
+    "CLAUDE_FLOW_AUTO_COMMIT": "false",
+    "CLAUDE_FLOW_AUTO_PUSH": "false",
+    "CLAUDE_FLOW_HOOKS_ENABLED": "true",
+    "CLAUDE_FLOW_TELEMETRY_ENABLED": "true",
+    "CLAUDE_FLOW_REMOTE_EXECUTION": "true",
+    "CLAUDE_FLOW_CHECKPOINTS_ENABLED": "true"
+  },
+  "swarm": {
+    "enforce_coordination": true,
+    "require_agent_approval": false
+  },
+  "permissions": {
+    "requireSwarmApproval": true,
+    "allow": [
+      "Bash(npx claude-flow:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run test:*)",
+      "Bash(npm test:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(git config:*)",
+      "Bash(git tag:*)",
+      "Bash(git branch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git stash:*)",
+      "Bash(jq:*)",
+      "Bash(node:*)",
+      "Bash(which:*)",
+      "Bash(pwd)",
+      "Bash(ls:*)",
+      "Bash(lsof:*)",
+      "Bash(npx ruv-swarm:*)",
+      "mcp__ruv-swarm",
+      "mcp__claude-flow@alpha",
+      "mcp__flow-nexus"
+    ],
+    "deny": [
+      "Bash(rm -rf /)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [],
+    "PostToolUse": []
+  },
+  "includeCoAuthoredBy": true,
+  "enabledMcpjsonServers": [
+    "claude-flow",
+    "ruv-swarm"
+  ],
+  "statusLine": {
+    "enabled": true,
+    "type": "command",
+    "command": "~/.claude/statusline-command.sh",
+    "refreshInterval": 2,
+    "envVars": {
+      "CLAUDE_JSON": "{model: {display_name: 'Sonnet 4.5'}, workspace: {current_dir: '%s'}}"
+    }
+  },
+  "agentDisplay": {
+    "enabled": true,
+    "highlightSubagents": true,
+    "swarmMode": "mcp",
+    "enforceCoordination": true
+  },
+  "experimental": {
+    "statusLineHooks": true
+  },
+  "terminal": {
+    "scrollback": 1000,
+    "autoScroll": false,
+    "bufferSize": 10000
+  },
+  "ui": {
+    "disableAutoScroll": true,
+    "enableScrollLock": true
+  }
+}
