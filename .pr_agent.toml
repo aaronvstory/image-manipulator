@@ -1,0 +1,40 @@
+# CodiumAI PR-Agent Configuration (2025)
+# This file must be in the root of your DEFAULT branch to take effect
+
+[pr_reviewer]
+# Focus on blocking/critical issues only
+focus_on_critical_issues = true
+inline_comments = true
+fail_on_major_issues = true
+require_focused_review = false
+require_estimate_effort_to_review = false
+require_score_review = false
+
+[pr_code_suggestions]
+# Generate committable code suggestions
+num_code_suggestions = 5
+commitable_code_suggestions = true
+suggestions_score_threshold = 7
+
+[pr_description]
+# Auto-generate PR descriptions
+publish_labels = true
+add_original_user_description = true
+keep_original_user_title = true
+
+[github_app]
+# Push trigger DISABLED by default (reduce noise/cost)
+handle_push_trigger = false
+
+# Automatic commands on PR events
+handle_pr_actions = ["opened", "reopened", "ready_for_review"]
+pr_commands = [
+    "/describe --pr_description.final_update_message=false",
+    "/review --pr_reviewer.require_focused_review=true",
+    "/improve --pr_code_suggestions.num_code_suggestions=5",
+]
+
+[config]
+# Model configuration: GPT-4.1 mini for efficiency, GPT-5 for complex PRs
+model = "openai/gpt-4.1-mini"
+fallback_models = ["openai/gpt-5"]
